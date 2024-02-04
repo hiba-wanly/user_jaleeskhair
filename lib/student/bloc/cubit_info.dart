@@ -7,8 +7,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userjaleeskhair/login/datalayer/store_user.dart';
+import 'package:userjaleeskhair/login/server/login_server.dart';
 import 'package:userjaleeskhair/student/bloc/state_info.dart';
 import 'package:userjaleeskhair/student/datalayer/book_model.dart';
+import 'package:userjaleeskhair/student/datalayer/rating_model.dart';
+import 'package:userjaleeskhair/student/datalayer/successfully_rating.dart';
 import 'package:userjaleeskhair/student/datalayer/user_model.dart';
 import 'package:userjaleeskhair/student/datalayer/user_rating_model.dart';
 import 'package:userjaleeskhair/student/server/info_server.dart';
@@ -29,10 +32,37 @@ class InfoCubit extends Cubit<InfoState>{
 
   List<UserRatingModel> userrating = [];
 
-  GetInfo(dynamic username,dynamic token) async {
+  List<Books> allBooks = [];
+
+  List<Books> allBooksafter  = [];
+  AuthApi authApi = AuthApi();
+
+  RatingBook ratingBook = RatingBook();
+
+  late UserRatingModel userRatingModel;
+
+  bool addRating = false ;
+
+  Map<int,dynamic> newRatings = {};
+
+
+
+  GetInfo(/*dynamic username,dynamic token*/) async {
+    // SharedPreferences.getInstance().then((shard){
+    //     token = shard.getString("save_token");
+    //     name = shard.getString("save_name");
+    //     // debugPrint("ttttttt"+token!);
+    //     debugPrint('***********');
+    // });
+    String? token = await  authApi.getToken();
+    String? name = await  authApi.getUserName();
+
+    debugPrint("HERERERER");
+    debugPrint(name);
+    debugPrint(token);
     emit(InfoLoadingState());
     debugPrint("log3");
-    final response = await infoApi.UserStatus(username,token);
+    final response = await infoApi.UserStatus(name,token);
     if(response != null){
       if(response == "User not found"){
         emit(InfoLoadedErrorState(message: response));
@@ -54,7 +84,9 @@ class InfoCubit extends Cubit<InfoState>{
         Map<int,dynamic> uniqueBooksCounter = {};
         Map<int, String> uniqueBooksDate = {};
 
-        List<Books> allBooks = userAccountInfo.returnedBorrows!;
+        this.allBooks = userAccountInfo.returnedBorrows!;
+
+        print("GGGGGGGGGGGGGg"+this.allBooks.length.toString());
         // print(allBooks.toString());
         allBooks.forEach((book) {
 
@@ -83,17 +115,26 @@ class InfoCubit extends Cubit<InfoState>{
 
         });
 
-        if(response22 != null){
+        if(response22 != null && response22 != 500){
+          print("66644442");
+
           this.userrating = response22.map((e) => UserRatingModel.fromJson(e)).toList();
+          userrating.forEach((element) {
+            // newRatings.addAll({"${element.globalBookEditionId}":element});
+            newRatings[element.globalBookEditionId!]= element;
+          });
+          print(newRatings.toString());
+
           allBooks.forEach((book){
-            userRatingBook[book.localBookId]=0;
+            book.userRatingModel = newRatings[book.globalBookEditionId!];
+            // userRatingBook[book.globalBookEditionId]=0;
           });
 
         }
 
         allBooks = allBooks.toSet().toList();
 
-
+        allBooksafter = allBooks;
         if(allBooks.isNotEmpty)
         {
 
@@ -140,5 +181,106 @@ class InfoCubit extends Cubit<InfoState>{
     }
 
   }
+
+
+
+  ////////////////////////
+
+  createUpdateRating(
+      dynamic global_book_edition_id,
+      dynamic title,
+      dynamic description,
+      dynamic rating
+      ) async
+  {
+    debugPrint("get01");
+    emit(RatingLoadingState());
+    String? token = await authApi.getToken();
+    debugPrint(token);
+    Map<String , dynamic> data = {
+      'global_book_edition_id': global_book_edition_id,
+      'title': title,
+      'description': description,
+      'rating': rating,
+      'public': 0,
+      'spoiler': 0
+    };
+    SuccessfullyRating ratingbookK = await ratingApi.createUpdateRating(data,token);
+    debugPrint("get02");
+    // debugPrint(ratingbookK.toString());
+    if(ratingbookK.message != null){
+      if(ratingbookK.message == 500){
+        emit(RatingNoTokenState());
+      }
+      else{
+        Map<int,dynamic> newRatingsadded = {};
+        userRatingModel = UserRatingModel.fromJson(ratingbookK.userRatingModel);
+        debugPrint("HHHH");
+        int id = userRatingModel.globalBookEditionId! ;
+        newRatingsadded[id] = userRatingModel;
+        newRatings.addAll(newRatingsadded);
+        debugPrint(userRatingModel.globalBookEditionId.toString());
+        debugPrint(this.allBooksafter.length.toString());
+        if(allBooks.isNotEmpty){
+          // allBooks.forEach((book) {
+          //   print("LLL11");
+          //   print(userRatingModel.globalBookEditionId);
+          //   book.userRatingModel = newRatingsadded[book.globalBookEditionId];
+          //   // if(book.userRatingModel!.globalBookEditionId == userRatingModel.globalBookEditionId){
+          //   //   print("LLL22");
+          //   //   allBooks[int.parse(userRatingModel.globalBookEditionId)].userRatingModel = userRatingModel;
+          //   //   addRating = true;
+          //   // }
+          //   // if(addRating == false){
+          //   //   print("LLL33");
+          //   //   book.userRatingModel = ratingbookK.userRatingModel[book.globalBookEditionId];
+          //   // }
+          // });
+          print("LLL");
+          allBooks.forEach((book){
+            print("KKKKMMMMMM");
+            book.userRatingModel = newRatings[book.globalBookEditionId];
+          });
+
+        }
+
+        emit(RatingCULoadedState(message: ratingbookK.message,books: allBooks));
+      }
+    }
+    else {
+      debugPrint("get0006");
+      emit(RatingLoadedErrorState(message: 'لا يمكن اتمام العملية'));
+    }
+  }
+
+
+  getUserBookRating(dynamic bookId) async
+  {
+    emit(RatingLoadingState());
+    debugPrint("log3");
+    String? token = await authApi.getToken();
+    debugPrint(token);
+    final response = await ratingApi.userBookRating(bookId,token);
+
+    if(response != null){
+      if(response == "User not found"){
+        emit(RatingLoadedErrorState(message: response));
+      }
+      if(response == 500){
+        emit(RatingNoTokenState());
+      }
+      else {
+        debugPrint("log4");
+        this.ratingBook =  RatingBook.fromJson(response);
+        emit(RatingGetLoadedState(ratingBook: ratingBook));
+      }
+    }
+    else{
+      emit(RatingLoadedErrorState(message: "لا يمكن اتمام العملية"));
+    }
+
+  }
+
+
 
 }

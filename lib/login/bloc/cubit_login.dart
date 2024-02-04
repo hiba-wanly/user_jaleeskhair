@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -63,7 +62,12 @@ class AuthCubit extends Cubit<AuthState>{
           // List<String> userString = pref.getStringList('user') ?? [];
           // userString.clear();
           // pref.clear();
-          debugPrint("KKKKKKKKK");
+          // debugPrint("KKKKKKKKK");
+          // SharedPreferences prefs = await SharedPreferences.getInstance();
+          // // prefs.remove("save_token");
+          // // prefs.remove("save_name");
+          // prefs.setString("save_token", loginModel.token);
+          // prefs.setString("save_name", loginModel.user.username);
           emit(AuthLoadedState(loginModel: loginModel));
         }
         else {

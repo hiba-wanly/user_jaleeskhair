@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:userjaleeskhair/student/datalayer/successfully_rating.dart';
 import 'package:userjaleeskhair/unit/unit.dart';
 
 class RatingApi{
@@ -11,7 +12,7 @@ class RatingApi{
     ),
   );
 
-  Future<dynamic> createRating(Map<String, dynamic> data,dynamic token) async
+  Future<SuccessfullyRating> createUpdateRating(Map<String, dynamic> data,dynamic token) async
   {
     try{
       debugPrint("get1");
@@ -28,19 +29,19 @@ class RatingApi{
       debugPrint("get2");
       if(response.statusCode == 200) {
         debugPrint("get3");
-        return response.data;
+        return SuccessfullyRating(userRatingModel: response.data['rating'],message: response.data['message']) ;
       }
       else {
         debugPrint("get4");
-        return null;
+        return SuccessfullyRating(userRatingModel: null, message: null);
       }
     }on DioError catch(e){
       if(e.response!.statusCode == 401){
-        return 500;
+        return SuccessfullyRating(userRatingModel: null, message: 500);
       }
       if(e.response!.statusCode == 404){
         debugPrint(e.response!.data['message']);
-        return e.response!.data['message'];
+        return SuccessfullyRating(userRatingModel: null, message: e.response!.data['message']);
       }
       debugPrint(e.response!.statusCode.toString());
       if(e.response!=null)
@@ -48,50 +49,50 @@ class RatingApi{
       else
         debugPrint(e.message);
       debugPrint("get5");
-      return null;
+      return SuccessfullyRating(userRatingModel: null, message: null);
     }
   }
 
-  Future<dynamic> updateRating(Map<String, dynamic> data,dynamic token) async
-  {
-    try{
-      debugPrint("get1");
-      FormData info = FormData.fromMap(data);
-      Response response = await dio.post('/api/rating_update_or_create',
-        options: Options(
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token'
-            }
-        ),
-        data:  info,
-      );
-      debugPrint("get2");
-      if(response.statusCode == 200) {
-        debugPrint("get3");
-        return response.data;
-      }
-      else {
-        debugPrint("get4");
-        return null;
-      }
-    }on DioError catch(e){
-      if(e.response!.statusCode == 401){
-        return 500;
-      }
-      if(e.response!.statusCode == 404){
-        debugPrint(e.response!.data['message']);
-        return e.response!.data['message'];
-      }
-      debugPrint(e.response!.statusCode.toString());
-      if(e.response!=null)
-        debugPrint(e.response!.statusMessage.toString());
-      else
-        debugPrint(e.message);
-      debugPrint("get5");
-      return null;
-    }
-  }
+  // Future<dynamic> updateRating(Map<String, dynamic> data,dynamic token) async
+  // {
+  //   try{
+  //     debugPrint("get1");
+  //     FormData info = FormData.fromMap(data);
+  //     Response response = await dio.post('/api/rating_update_or_create',
+  //       options: Options(
+  //           headers: {
+  //             'Accept': 'application/json',
+  //             'Authorization': 'Bearer $token'
+  //           }
+  //       ),
+  //       data:  info,
+  //     );
+  //     debugPrint("get2");
+  //     if(response.statusCode == 200) {
+  //       debugPrint("get3");
+  //       return response.data;
+  //     }
+  //     else {
+  //       debugPrint("get4");
+  //       return null;
+  //     }
+  //   }on DioError catch(e){
+  //     if(e.response!.statusCode == 401){
+  //       return 500;
+  //     }
+  //     if(e.response!.statusCode == 404){
+  //       debugPrint(e.response!.data['message']);
+  //       return e.response!.data['message'];
+  //     }
+  //     debugPrint(e.response!.statusCode.toString());
+  //     if(e.response!=null)
+  //       debugPrint(e.response!.statusMessage.toString());
+  //     else
+  //       debugPrint(e.message);
+  //     debugPrint("get5");
+  //     return null;
+  //   }
+  // }
 
   Future<dynamic> userBookRating(dynamic book_id, dynamic token) async
   {
@@ -132,7 +133,7 @@ class RatingApi{
     }
   }
 
-  Future<dynamic> userRatings(dynamic user_id, dynamic token) async
+  Future<List<dynamic>> userRatings(dynamic user_id, dynamic token) async
   {
     try{
       debugPrint("get1");
@@ -151,11 +152,12 @@ class RatingApi{
       }
       else {
         debugPrint("get4");
-        return null;
+        return [];
       }
     }on DioError catch(e){
       if(e.response!.statusCode == 401){
-        return 500;
+        // return 500;
+        return [500];
       }
       if(e.response!.statusCode == 404){
         debugPrint(e.response!.data['message']);
@@ -167,7 +169,7 @@ class RatingApi{
       else
         debugPrint(e.message);
       debugPrint("get5");
-      return null;
+      return [];
     }
   }
 

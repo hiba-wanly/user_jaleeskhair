@@ -1,11 +1,11 @@
 class UserRatingModel {
   int? id;
-  int? globalBookEditionId;
-  int? rating;
-  String? title;
-  String? description;
-  int? spoiler;
-  int? public;
+  dynamic globalBookEditionId;
+  dynamic rating;
+  dynamic title;
+  dynamic description;
+  dynamic spoiler;
+  dynamic public;
 
   UserRatingModel(
       {this.id,
@@ -19,7 +19,7 @@ class UserRatingModel {
   UserRatingModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     globalBookEditionId = json['global_book_edition_id'];
-    rating = json['rating'];
+    rating = json['rating'] ;
     title = json['title'];
     description = json['description'];
     spoiler = json['spoiler'];

@@ -21,12 +21,17 @@ class AuthApi {
   Future<dynamic> Login(Map<String , dynamic> data) async{
     try{
       debugPrint("log1");
-      Response response=await dio.post('/api/login', data: data);
+      FormData info = FormData.fromMap(data);
+      Response response = await dio.post('/api/login', data: info);
       debugPrint("log2");
       if (response.data['result'] == "success") {
         debugPrint(response.data['token']);
-        storeToken(response.data['token']);
+        storeToken(response.data['token'].toString());
+        storeUserName(response.data['user']['username'].toString());
+        print(getToken());
         SharedPreferences prefs = await SharedPreferences.getInstance();
+        // prefs.remove("save_token");
+        // prefs.remove("save_name");
         prefs.setString("save_token", response.data['token']);
         prefs.setString("save_name", response.data['user']['username']);
         return response.data;
@@ -36,6 +41,7 @@ class AuthApi {
       }
     }
     on DioError catch (e) {
+      print("5555");
       // debugPrint(e.response!.statusMessage);
       return null;
     }
@@ -46,6 +52,13 @@ class AuthApi {
   }
   Future getToken () async {
     return await storage.read(key: 'token');
+  }
+
+  storeUserName(String name) async {
+    await storage.write(key: 'user_name', value: name);
+  }
+  Future getUserName () async {
+    return await storage.read(key: 'user_name');
   }
 
 }

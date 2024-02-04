@@ -34,6 +34,9 @@ class _AuthLoginState extends State<AuthLogin> {
           name = shard.getString("save_name");
           // debugPrint("ttttttt"+token!);
           debugPrint('***********');
+          debugPrint(token);
+          debugPrint(name);
+          debugPrint("PPP");
         });
       });
       // return CircularProgressIndicator();
@@ -57,15 +60,18 @@ class _AuthLoginState extends State<AuthLogin> {
           ],
         ),
       );
-    }else {
+    }
+    else {
       if(token == null){
         return LoginScreen();
       } else {
         // return LoginScreen();
-        return BlocProvider(
-          create: (context) => InfoCubit(InfoInitialState()),
-          child: StudentPage(token: token! ,name: name!,),
-        );
+        return
+          // BlocProvider(
+          // create: (context) => InfoCubit(InfoInitialState()),
+          // child:
+          StudentPage();
+        // );
       }
     }
 

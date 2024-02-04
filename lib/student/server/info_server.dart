@@ -34,6 +34,7 @@ class InfoApi{
       }
     }on DioError catch(e){
       if(e.response!.statusCode == 401){
+        debugPrint(e.response!.data['message']);
         return 500;
       }
       if(e.response!.statusCode == 404){

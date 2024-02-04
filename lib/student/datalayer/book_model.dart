@@ -1,3 +1,5 @@
+import 'package:userjaleeskhair/student/datalayer/user_rating_model.dart';
+
 class Books {
   // late dynamic library;
   // late dynamic borrowerName;
@@ -14,6 +16,10 @@ class Books {
   late dynamic realReturnDate;
   late dynamic returned;
   late int late;
+
+  UserRatingModel? userRatingModel;
+
+  int rating = 0;
 
   @override
   bool operator == (Object other) =>
@@ -60,3 +66,17 @@ class Books {
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 
 import 'package:userjaleeskhair/login/datalayer/store_user.dart';
 import 'package:userjaleeskhair/student/datalayer/book_model.dart';
+import 'package:userjaleeskhair/student/datalayer/rating_model.dart';
 import 'package:userjaleeskhair/student/datalayer/user_model.dart';
 
 abstract class InfoState{}
@@ -31,3 +32,32 @@ class InfoLoadedErrorState extends InfoState {
 }
 
 class NoTokenState extends InfoState {}
+
+
+
+class RatingInitialState extends InfoState{}
+
+class RatingLoadingState extends InfoState{}
+
+class RatingCULoadingState extends InfoState{
+  final String message ;
+  RatingCULoadingState({required this.message});
+}
+
+class RatingCULoadedState extends InfoState {
+  final String message ;
+  final List<Books> books;
+  RatingCULoadedState({required this.message,required this.books});
+}
+
+class RatingGetLoadedState extends InfoState {
+  final RatingBook ratingBook;
+  RatingGetLoadedState({required this.ratingBook});
+}
+
+class RatingLoadedErrorState extends InfoState {
+  final String message ;
+  RatingLoadedErrorState({required this.message});
+}
+
+class RatingNoTokenState extends InfoState {}

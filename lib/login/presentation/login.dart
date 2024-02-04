@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userjaleeskhair/student/bloc/cubit_info.dart';
 import 'package:userjaleeskhair/student/bloc/state_info.dart';
 
@@ -249,15 +250,19 @@ class _LoginScreenState extends State<LoginScreen> {
         child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthLoadedState) {
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BlocProvider(create: (BuildContext context) => InfoCubit(InfoInitialState()),
-                    child: StudentPage(
+                    builder: (context) =>
+                    //     BlocProvider(create: (BuildContext context) => InfoCubit(InfoInitialState()),
+                    // child:
+                    StudentPage(
                       // userAccount: state.loginModel
-                      name: state.loginModel.user.username,
-                      token: state.loginModel.token
-                      ,),),
+                      // name: state.loginModel.user.username,
+                      // token: state.loginModel.token
+                      )
+                      // ,),
                   ),
                 );
               }
